@@ -14,11 +14,16 @@ class Pozycja {
         this.cena = cena;
     }
     double obliczWartosc(){return this.ileSztuk*this.cena;}
-
-    boolean equalTo(Pozycja p){
-        return this.nazwaTowaru.equals(p.nazwaTowaru);
+    double obliczWartoscZRabatem(){
+        if(this.ileSztuk>=5&&this.ileSztuk<=10)
+            return obliczWartosc()*0.95;
+        else if(this.ileSztuk<=20&&this.ileSztuk>10)
+            return obliczWartosc()*0.90;
+        else if(this.ileSztuk>20)
+            return obliczWartosc()*0.85;
+        else
+            return obliczWartosc();
     }
-
     public String toString(){
         StringBuilder nazwaTowaru20=new StringBuilder(20);
         nazwaTowaru20.append(this.nazwaTowaru);
