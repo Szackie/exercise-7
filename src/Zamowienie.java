@@ -1,14 +1,13 @@
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
-class Zamowienie {
+class Zamowienie implements Serializable {
     ArrayList<Pozycja> pozycje = new ArrayList<>();
-    int ileDodanych;
     int maksRozmiar;
     double rabat=0;
 
+    @SuppressWarnings("unused")
     Zamowienie() {
         this.maksRozmiar = 10;
     }
@@ -45,17 +44,17 @@ class Zamowienie {
         StringBuilder lancuch = new StringBuilder();
         int id = 1;
         for (Pozycja pozycja : this.pozycje) {
-            lancuch.append(id + ". " + pozycja.toString());
+            lancuch.append(id).append(". ").append(pozycja.toString());
             lancuch.append("\n");
             id++;
         }
-        lancuch.append("Razem: " + obliczWartosc() + " zl.");
+        lancuch.append("Razem: ").append(obliczWartosc()).append(" zl.");
         lancuch.append("\n");
 
         if(rabat>0)
-            lancuch.append("Suma rabatu: "+rabat);
+            lancuch.append("Suma rabatu: ").append(rabat);
 
-        return "Zamowienie:\n" + lancuch.toString();
+        return "Zamowienie:\n" + lancuch;
     }
 
     void usunPozycje(int indeks) {
@@ -66,21 +65,53 @@ class Zamowienie {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Podaj nową nazwę i wciśnij \"Enter\"");
-        String nowaNazwa = scanner.next();
-        this.pozycje.get(indeks - 1).nazwaTowaru = nowaNazwa;
+        this.pozycje.get(indeks - 1).nazwaTowaru = scanner.next();
 
         System.out.println("Podaj nową cenę i wciśnij \"Enter\"");
-        double nowaCena = 0;
+        double nowaCena;
         nowaCena = scanner.nextDouble();
         this.pozycje.get(indeks - 1).cena = nowaCena;
 
         System.out.println("Podaj nową liczbę sztuk i wciśnij \"Enter\"");
-        int nowaLiczbaSztuk = scanner.nextInt();
-        this.pozycje.get(indeks - 1).ileSztuk = nowaLiczbaSztuk;
+        this.pozycje.get(indeks - 1).ileSztuk = scanner.nextInt();
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void zapiszZamowienie(Zamowienie z,String nazwaPliku){
+        File plik=new File(nazwaPliku);
+        while(plik.exists())
+        {
+            System.out.println("Plik o tej nazwie już istnieje. Potwierdź nazwę, jeśli chcesz go nadpisać, lub wpisz nową nazwę, jeśli chcesz utworzyć nowy plik");
+            Scanner scanner=new Scanner(System.in);
+            String nowaNazwaPliku=scanner.next();
+            if(nowaNazwaPliku.equals(nazwaPliku))
+                break;
+            nazwaPliku=nowaNazwaPliku;
+            plik=new File(nazwaPliku);
+        }
+        try {
+            ObjectOutputStream outS= new ObjectOutputStream(new FileOutputStream(nazwaPliku));
+            outS.writeObject(z);
+            outS.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static Zamowienie wczytajZamowienie(String nazwaPliku){
+        Zamowienie zamowienie=null;
+        try{
+            ObjectInputStream objectInputStream=new ObjectInputStream(new FileInputStream(nazwaPliku));
+            zamowienie=(Zamowienie)objectInputStream.readObject();
+            objectInputStream.close();
+            return zamowienie;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return zamowienie;
+    }
+
+
+    public static void main(String[] args) {
         Pozycja p1 = new Pozycja("Chleb", 1, 3.5);
         System.out.println(p1);
         Pozycja p2 = new Pozycja("Cukier", 3, 4);
@@ -96,9 +127,11 @@ class Zamowienie {
         z.dodajPozycje(p3);
         z.dodajPozycje(p4);
         System.out.println(z);
-        z.edytujPozycje(2);
+ //       z.edytujPozycje(2);
         System.out.println(z);
         z.usunPozycje(2);
         System.out.println(z);
+    zapiszZamowienie(z,"C:\\Users\\Szymon\\IdeaProjects\\Exercise 7\\zamowienie.bin");
+        System.out.println( wczytajZamowienie("C:\\Users\\Szymon\\IdeaProjects\\Exercise 7\\zamowienie.bin"));
     }
 }

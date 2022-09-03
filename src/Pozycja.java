@@ -1,4 +1,6 @@
-class Pozycja {
+import java.io.Serializable;
+
+class Pozycja implements Serializable {
     String nazwaTowaru;
     int ileSztuk;
     double cena;
@@ -8,7 +10,7 @@ class Pozycja {
         this.ileSztuk = ileSztuk;
     }
 
-    Pozycja(String nazwaTowaru, int ileSztuk, double cena){
+    Pozycja(String nazwaTowaru, int ileSztuk, double cena) {
         this.nazwaTowaru = nazwaTowaru;
         this.ileSztuk = ileSztuk;
         this.cena = cena;
